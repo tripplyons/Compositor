@@ -46,6 +46,15 @@ Because it’s open source, you can download the Xcode project and add, remove, 
 - Add Noise, Lens Correction and Remove Background
 - Live previews, limited to the selection when there is one
 
+### AI generation and editing
+- Generate images and edit layers with [Qwen-Image-2.1](https://huggingface.co/Qwen/Qwen-Image-2.1), which runs on your Mac (AI > Generate Image…)
+- Edit the active layer or the whole canvas from a prompt; with a selection, only that part is sent and changed
+- Send up to ten layers or image files as reference images and name them in the prompt by number ("the jacket from image 2")
+- Work at 0.5, 1, 2.4 or 4 megapixels; 0.5 is a quick draft
+- Transparent backgrounds: the model returns a real alpha channel
+- Every result arrives as a new layer, so nothing underneath changes
+- Setup is one button: Compositor downloads [uv](https://docs.astral.sh/uv/), a Python environment and the model (about 36 GB) into `~/Library/Application Support/Compositor/AI`, and Uninstall removes them
+
 ### Canvas and files
 - Multiple projects in tabs
 - Crop with snapping, and Option for symmetric cropping
@@ -59,10 +68,19 @@ Because it’s open source, you can download the Xcode project and add, remove, 
 
 - macOS 26
 - Xcode 26 (to build from source)
+- For AI generation: an Apple silicon Mac, 64 GB of memory recommended, and about 40 GB of free disk space
+
+The model is under the Qwen Research License, which doesn't allow commercial use. Compositor's own license doesn't cover it.
 
 ## Building
 
 Open `Compositor.xcodeproj` and run the **Compositor** scheme.
+
+### How the AI helper is built
+
+The editor is sandboxed, and the sandbox refuses to run anything a sandboxed process downloaded, Python included. So the model runs from `CompositorAI`, an XPC service inside the app bundle that isn't sandboxed. It installs a pinned, checksummed uv, syncs the locked environment in `CompositorAI/Python`, and keeps one Python worker alive between generations so the model loads once. The editor and the helper share `Shared/AIRuntimeProtocol.swift`. Because the helper is unsandboxed, the app can ship with Developer ID but not on the Mac App Store.
+
+To move to newer packages, edit `CompositorAI/Python/pyproject.toml` and run `uv lock` there; installed copies resync when the lock file changes.
 
 ## Releasing
 

@@ -109,6 +109,12 @@ final class EditorSession {
     var effectSelection: LayerEffectSelection?
     @ObservationIgnored var effectsPreviews = EffectsPreviewCache()
     var projectURL: URL?
+    var showsAIPanel = false
+    var ai = AIGenerationSettings()
+    var aiFailure: String?
+    /// A generated image waiting for the canvas to be free; see `addAIResult`.
+    var aiResult: AIResult?
+    var aiLastSeed: UInt32?
     /// Blocks overlapping edits immediately. Not observed by the UI: controls only dim via
     /// `showsBusy`, after an operation has run long enough to be worth showing, so quick
     /// edits (invert, fills, stroke commits) never flash the interface.

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5A9C0D1E2F3A4B5C6D7E8F01 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 5A9C0D1E2F3A4B5C6D7E8F03 /* Sparkle */; };
+		A1A1A1A1000000000000000D /* CompositorAI.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = A1A1A1A10000000000000001 /* CompositorAI.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,12 +26,34 @@
 			remoteGlobalIDString = 8F311F98304F03BB0017D14F;
 			remoteInfo = Compositor;
 		};
+		A1A1A1A1000000000000000B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8F311F91304F03BB0017D14F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A1A1A1A10000000000000007;
+			remoteInfo = CompositorAI;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A1A1A1A1000000000000000E /* Embed XPC Services */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
+			dstSubfolderSpec = 16;
+			files = (
+				A1A1A1A1000000000000000D /* CompositorAI.xpc in Embed XPC Services */,
+			);
+			name = "Embed XPC Services";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		8F311F99304F03BB0017D14F /* Compositor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Compositor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F311FA6304F03BC0017D14F /* CompositorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CompositorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F311FB0304F03BC0017D14F /* CompositorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CompositorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1A1A1A10000000000000001 /* CompositorAI.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = CompositorAI.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -47,6 +70,16 @@
 		8F311FB3304F03BC0017D14F /* CompositorUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = CompositorUITests;
+			sourceTree = "<group>";
+		};
+		A1A1A1A10000000000000002 /* CompositorAI */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = CompositorAI;
+			sourceTree = "<group>";
+		};
+		A1A1A1A10000000000000003 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -74,6 +107,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A1A1A1A10000000000000005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -81,6 +121,8 @@
 			isa = PBXGroup;
 			children = (
 				8F311F9B304F03BB0017D14F /* Compositor */,
+				A1A1A1A10000000000000002 /* CompositorAI */,
+				A1A1A1A10000000000000003 /* Shared */,
 				8F311FA9304F03BC0017D14F /* CompositorTests */,
 				8F311FB3304F03BC0017D14F /* CompositorUITests */,
 				8F311F9A304F03BB0017D14F /* Products */,
@@ -93,6 +135,7 @@
 				8F311F99304F03BB0017D14F /* Compositor.app */,
 				8F311FA6304F03BC0017D14F /* CompositorTests.xctest */,
 				8F311FB0304F03BC0017D14F /* CompositorUITests.xctest */,
+				A1A1A1A10000000000000001 /* CompositorAI.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -107,13 +150,16 @@
 				8F311F95304F03BB0017D14F /* Sources */,
 				8F311F96304F03BB0017D14F /* Frameworks */,
 				8F311F97304F03BB0017D14F /* Resources */,
+				A1A1A1A1000000000000000E /* Embed XPC Services */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A1A1A1A1000000000000000C /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				8F311F9B304F03BB0017D14F /* Compositor */,
+				A1A1A1A10000000000000003 /* Shared */,
 			);
 			name = Compositor;
 			packageProductDependencies = (
@@ -169,6 +215,29 @@
 			productReference = 8F311FB0304F03BC0017D14F /* CompositorUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		A1A1A1A10000000000000007 /* CompositorAI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1A1A1A10000000000000008 /* Build configuration list for PBXNativeTarget "CompositorAI" */;
+			buildPhases = (
+				A1A1A1A10000000000000004 /* Sources */,
+				A1A1A1A10000000000000005 /* Frameworks */,
+				A1A1A1A10000000000000006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A1A1A1A10000000000000002 /* CompositorAI */,
+				A1A1A1A10000000000000003 /* Shared */,
+			);
+			name = CompositorAI;
+			packageProductDependencies = (
+			);
+			productName = CompositorAI;
+			productReference = A1A1A1A10000000000000001 /* CompositorAI.xpc */;
+			productType = "com.apple.product-type.xpc-service";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -189,6 +258,9 @@
 					8F311FAF304F03BC0017D14F = {
 						CreatedOnToolsVersion = 26.6;
 						TestTargetID = 8F311F98304F03BB0017D14F;
+					};
+					A1A1A1A10000000000000007 = {
+						CreatedOnToolsVersion = 26.6;
 					};
 				};
 			};
@@ -212,6 +284,7 @@
 				8F311F98304F03BB0017D14F /* Compositor */,
 				8F311FA5304F03BC0017D14F /* CompositorTests */,
 				8F311FAF304F03BC0017D14F /* CompositorUITests */,
+				A1A1A1A10000000000000007 /* CompositorAI */,
 			);
 		};
 /* End PBXProject section */
@@ -232,6 +305,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		8F311FAE304F03BC0017D14F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1A1A1A10000000000000006 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -262,6 +342,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A1A1A1A10000000000000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -274,6 +361,11 @@
 			isa = PBXTargetDependency;
 			target = 8F311F98304F03BB0017D14F /* Compositor */;
 			targetProxy = 8F311FB1304F03BC0017D14F /* PBXContainerItemProxy */;
+		};
+		A1A1A1A1000000000000000C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A1A1A1A10000000000000007 /* CompositorAI */;
+			targetProxy = A1A1A1A1000000000000000B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -553,6 +645,49 @@
 			};
 			name = Release;
 		};
+		A1A1A1A10000000000000009 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				CURRENT_PROJECT_VERSION = 9;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/CompositorAI-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Compositor AI";
+				MARKETING_VERSION = 1.1.3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wonderassembly.compositor.ai;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A1A1A1A1000000000000000A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3E4X3B9Z9T;
+				CURRENT_PROJECT_VERSION = 9;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/CompositorAI-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Compositor AI";
+				MARKETING_VERSION = 1.1.3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wonderassembly.compositor.ai;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -588,6 +723,15 @@
 			buildConfigurations = (
 				8F311FC1304F03BC0017D14F /* Debug */,
 				8F311FC2304F03BC0017D14F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1A1A1A10000000000000008 /* Build configuration list for PBXNativeTarget "CompositorAI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1A1A1A10000000000000009 /* Debug */,
+				A1A1A1A1000000000000000A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

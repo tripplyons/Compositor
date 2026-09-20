@@ -218,6 +218,18 @@ struct CompositorApp: App {
                             .disabled(!session.canAdjustColors || session.hueSaturation != nil)
                     }
                 }
+                CommandMenu("AI") {
+                    Button("Generate Image…") {
+                        session.ai.mode = .generate
+                        session.showsAIPanel = true
+                    }
+                    .keyboardShortcut("g", modifiers: [.command, .control])
+                    Button("Edit with AI…") {
+                        session.ai.mode = .edit
+                        session.showsAIPanel = true
+                    }
+                    .disabled(session.document == nil)
+                }
                 CommandMenu("Layer") {
                     Menu("New Adjustment Layer") {
                         ForEach(AdjustmentKind.allCases, id: \.self) { kind in

@@ -172,9 +172,11 @@ extension EditorSession {
 
     /// Inserts pixels as a new layer above the active one (inside its folder), all in one undo
     /// step. Pasting drops the selection, as in Photoshop; a drawn shape keeps it.
-    func addPixelLayer(_ image: CGImage, at origin: CGPoint, name: String, editName: String, dropsSelection: Bool = true, shape: LayerShape? = nil, text: LayerText? = nil) {
+    /// `size` is what the layer covers on the canvas when that isn't its pixel size.
+    func addPixelLayer(_ image: CGImage, at origin: CGPoint, size: CGSize? = nil, name: String, editName: String, dropsSelection: Bool = true, shape: LayerShape? = nil, text: LayerText? = nil) {
         guard let document, let thumbnail = try? PixelInvert.thumbnail(of: image) else { return }
         var layer = ImageLayer(asset: ImportedImage(image: image, thumbnail: thumbnail, name: name), origin: origin)
+        if let size { layer.transform.size = size }
         layer.name = name
         layer.shape = shape
         layer.text = text
@@ -196,7 +198,7 @@ extension EditorSession {
     }
 
     /// Normalizes an image from another app to the working sRGB RGBA format.
-    private static func sRGBCopy(of image: CGImage) throws -> CGImage {
+    static func sRGBCopy(of image: CGImage) throws -> CGImage {
         let context = try BrushRaster.context(width: image.width, height: image.height, mask: false)
         BrushRaster.draw(image, in: CGRect(x: 0, y: 0, width: image.width, height: image.height), mask: false, context: context)
         guard let copy = context.makeImage() else { throw ExportError.render }

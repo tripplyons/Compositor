@@ -201,6 +201,7 @@ struct ContentView: View {
                 filterPanel.show(title: session.filterEdit?.kind.rawValue ?? "Filter", content: FilterSheet(session: session))
             }
         }
+        .modifier(AIPanelPresenter(session: session))
         .onChange(of: session.document == nil) { _, empty in
             if !empty { session.canvasFocusRequest += 1 }
         }
@@ -408,6 +409,22 @@ extension View {
 }
 
 /// Reports the width it is laid out at. Kept out of the editor's body, whose type-checking is already near its limit.
+/// Shows the AI panel while the session asks for it. Apart from the body, which is as long as the type checker
+/// will take.
+private struct AIPanelPresenter: ViewModifier {
+    let session: EditorSession
+    @State private var panel = FloatingPanelController(name: "aiPanel")
+
+    func body(content: Content) -> some View {
+        content.onChange(of: session.showsAIPanel) { _, shown in
+            if shown {
+                panel.onClose = { session.showsAIPanel = false }
+                panel.show(title: "Generate with AI", content: AIPanel(session: session))
+            } else { panel.close() }
+        }
+    }
+}
+
 private struct WidthReader: ViewModifier {
     @Binding var width: CGFloat
     func body(content: Content) -> some View {
