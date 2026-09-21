@@ -19,7 +19,7 @@ struct TypeControls: View {
             ScrollView(.horizontal) {
                 HStack(spacing: 10) {
                     TypeFontPicker(fontName: value(\.fontName))
-                        .frame(width: 185).help("Font face, including bold and italic variants")
+                        .frame(width: 210).help("Font face, including bold and italic variants")
                     TextField("Size", value: number(\.fontSize), format: .number).frame(width: 52).unitSuffix("px")
                         .arrowSteps(value: { Double(session.currentTextStyle.fontSize) },
                                     change: { stepped in session.changeTextStyle { $0.fontSize = CGFloat(min(2000, max(1, stepped))) } })
@@ -90,9 +90,13 @@ private struct TypeFontPicker: NSViewRepresentable {
     func makeCoordinator() -> Coordinator { Coordinator(fontName: $fontName) }
 
     func makeNSView(context: Context) -> NSPopUpButton {
-        let button = NSPopUpButton(frame: .zero, pullsDown: false)
+        let button = FixedWidthPopUpButton(frame: .zero, pullsDown: false)
         button.addItem(withTitle: fontName)
         button.borderShape = .capsule
+        // A long font name is cut off at its end rather than widening the control or scrolling its start away.
+        button.cell?.lineBreakMode = .byTruncatingTail
+        button.cell?.usesSingleLineMode = true
+        button.cell?.alignment = .left
         button.setAccessibilityLabel("Font")
         button.target = context.coordinator
         button.action = #selector(Coordinator.choose(_:))
@@ -112,6 +116,14 @@ private struct TypeFontPicker: NSViewRepresentable {
     static func dismantleNSView(_ button: NSPopUpButton, coordinator: Coordinator) {
         button.menu?.delegate = nil
         button.target = nil
+    }
+
+    /// The font list holds names of every length; the control keeps whatever width it is given, so choosing a long
+    /// name can't stretch it — or leave it stretched once a short one is chosen again.
+    final class FixedWidthPopUpButton: NSPopUpButton {
+        override var intrinsicContentSize: NSSize {
+            NSSize(width: NSView.noIntrinsicMetric, height: super.intrinsicContentSize.height)
+        }
     }
 
     final class Coordinator: NSObject, NSMenuDelegate {

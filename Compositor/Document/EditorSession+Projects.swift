@@ -12,7 +12,8 @@ extension EditorSession {
                 transform: layer.transform, imageFile: layer.asset == nil ? nil : "\(layer.id.uuidString).png", parentID: layer.parentID, isGroup: layer.isGroup, opacity: layer.opacity, blendMode: layer.blendMode, maskFile: layer.mask == nil ? nil : "\(layer.id.uuidString).mask.png", maskEnabled: layer.mask?.isEnabled, maskSourceID: layer.maskSourceID, adjustment: layer.adjustment, maskPlacement: layer.mask?.placement, maskLinked: layer.mask?.isLinked, shape: layer.liveShape?.style, text: layer.liveText?.style)
         }
         return ProjectSnapshot(manifest: ProjectManifest(resolution: document.resolution, documentID: document.id, width: document.width,
-            height: document.height, activeLayerID: activeLayerID, layers: layers), images: images, masks: masks)
+            height: document.height, activeLayerID: activeLayerID, layers: layers,
+            guides: document.guides.isEmpty ? nil : document.guides), images: images, masks: masks)
     }
 
     /// Called only after the entire package has successfully validated and loaded.
@@ -20,6 +21,7 @@ extension EditorSession {
         collapsedGroupIDs = []
         isMaskSelected = false
         cancelCrop()
+        guideDrag = nil
         let manifest = snapshot.manifest
         transformEdit = nil
         document = CanvasDocument(id: manifest.documentID, width: manifest.width, height: manifest.height,
@@ -28,7 +30,7 @@ extension EditorSession {
                            isVisible: $0.isVisible, transform: $0.transform, parentID: $0.parentID, isGroup: $0.isGroup == true, opacity: $0.opacity ?? 1, blendMode: $0.blendMode ?? .normal, mask: snapshot.mask(for: $0), maskSourceID: $0.maskSourceID, adjustment: $0.adjustment,
                            shape: LayerShape.loaded($0.shape, image: snapshot.images[$0.id]?.image),
                            text: LayerText.loaded($0.text, image: snapshot.images[$0.id]?.image))
-            }, resolution: manifest.resolution ?? 72)
+            }, resolution: manifest.resolution ?? 72, guides: manifest.guides ?? [])
         activeLayerID = manifest.activeLayerID
         projectURL = url
         renamingLayerID = nil
@@ -41,6 +43,7 @@ extension EditorSession {
         isMaskSelected = false
         cancelCrop()
         transformEdit = nil
+        guideDrag = nil
         document = nil
         activeLayerID = nil
         renamingLayerID = nil

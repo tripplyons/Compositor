@@ -7,6 +7,7 @@ final class CanvasTextView: NSTextView {
     private let textUndo = UndoManager()
     override var undoManager: UndoManager? { textUndo }
     override func keyDown(with event: NSEvent) {
+        guard let event = ShortcutSettings.shared.textEvent(event) else { return }
         if event.keyCode == 53 { editor?.canvas?.session.cancelText(); return }
         // Option with the arrows sets spacing, as in Photoshop: left and right the tracking, up and down the
         // leading. Shift makes each step ten.

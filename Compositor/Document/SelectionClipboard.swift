@@ -145,22 +145,34 @@ extension EditorSession {
     }
 
     func duplicateActiveLayer() {
-        guard canEditLayers, let layer = activeLayer, !layer.isGroup,
+        guard canEditLayers, let layer = activeLayer,
               let index = document?.layers.firstIndex(where: { $0.id == layer.id }) else { return }
-        let copy = ImageLayer(id: UUID(), asset: layer.asset, name: "\(layer.name) copy", isVisible: layer.isVisible,
-                              transform: layer.transform, parentID: layer.parentID, isGroup: false,
-                              opacity: layer.opacity, blendMode: layer.blendMode, mask: layer.mask, maskSourceID: layer.maskSourceID, adjustment: layer.adjustment, shape: layer.shape, effects: layer.effects, text: layer.text)
+        let included = descendantIDs(of: layer.id).union([layer.id])
+        let originals = (document?.layers ?? []).filter { included.contains($0.id) }
+        guard (document?.layers.count ?? 0) + originals.count <= 10_000 else { return }
+        let mapping = Dictionary(uniqueKeysWithValues: originals.map { ($0.id, UUID()) })
+        let copies = originals.map { original in
+            ImageLayer(id: mapping[original.id]!, asset: original.asset,
+                name: original.name + (original.id == layer.id ? " copy" : ""), isVisible: original.isVisible,
+                transform: original.transform, parentID: original.parentID.map { mapping[$0] ?? $0 },
+                isGroup: original.isGroup, opacity: original.opacity, blendMode: original.blendMode,
+                mask: original.mask, maskSourceID: original.maskSourceID.map { mapping[$0] ?? $0 },
+                adjustment: original.adjustment, shape: original.shape, effects: original.effects, text: original.text)
+        }
         beginEdit("Duplicate Layer")
-        document?.layers.insert(copy, at: index + 1)
-        activeLayerID = copy.id
+        document?.layers.insert(contentsOf: copies, at: index + 1)
+        for original in originals where collapsedGroupIDs.contains(original.id) {
+            collapsedGroupIDs.insert(mapping[original.id]!)
+        }
+        activeLayerID = mapping[layer.id]
         endEdit()
     }
 
     /// Option-drag in the Layers panel: a copy of the layer placed where it was dropped (inside `parent`,
-    /// above `target`, or at the very bottom), as one undo step. Folders aren't duplicated this way.
+    /// above `target`, or at the very bottom), as one undo step. Folders carry all descendants.
     @discardableResult
     func duplicateLayer(_ id: UUID, in parent: UUID?, above target: UUID? = nil, atBottom: Bool = false) -> Bool {
-        guard canEditLayers, let layer = document?.layers.first(where: { $0.id == id }), !layer.isGroup,
+        guard canEditLayers,
               canPlaceLayer(id, in: parent) else { return false }
         beginEdit("Duplicate Layer")
         defer { endEdit() }

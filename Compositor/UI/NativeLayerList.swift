@@ -173,9 +173,8 @@ struct NativeLayerList: NSViewRepresentable {
                   (0...rows.count).contains(row) else { return [] }
             let ids = draggedLayers(info)
             guard !ids.isEmpty else { return [] }
-            // With Option held the drag offers only Copy: the drop places duplicates (folders aren't duplicated).
+            // With Option held the drag offers only Copy, including complete folder trees.
             let copying = info.draggingSourceOperationMask == .copy
-            if copying, ids.contains(where: { id in session.document?.layers.first(where: { $0.id == id })?.isGroup != false }) { return [] }
             let intoFolder = operation == .on && rows.indices.contains(row) && rows[row].isGroup
             let parent = intoFolder ? rows[row].id : (rows.indices.contains(row) ? rows[row].parentID : nil)
             guard ids.allSatisfy({ session.canPlaceLayer($0, in: parent) }) else { return [] }
@@ -319,7 +318,7 @@ final class LayerTableView: NSTableView {
             return session.canEditLayers ? CanvasView.duplicateCursor : NSCursor.arrow
         }
         guard isClippingZone(point, row: index) else {
-            return session.canEditLayers && layer.isGroup != true ? CanvasView.duplicateCursor : NSCursor.arrow
+            return session.canEditLayers ? CanvasView.duplicateCursor : NSCursor.arrow
         }
         guard session.canToggleClippingMask(layer.id) else { return NSCursor.arrow }
         return layer.maskSourceID == nil ? Self.createClippingCursor : Self.releaseClippingCursor
@@ -330,6 +329,7 @@ final class LayerTableView: NSTableView {
     private static let clippingStrip: CGFloat = 10
     private func isClippingZone(_ point: NSPoint, row: Int) -> Bool {
         guard row >= 0 else { return false }
+        if let entries = session?.layerRows, entries.indices.contains(row), entries[row].layer.isGroup == true { return false }
         let rect = rect(ofRow: row)
         return point.y >= rect.maxY - min(Self.clippingStrip, rect.height / 3)
     }
@@ -407,6 +407,7 @@ final class LayerTableView: NSTableView {
         super.mouseDown(with: event)
     }
     override func keyDown(with event: NSEvent) {
+        guard let event = ShortcutSettings.shared.canvasEvent(event) else { return }
         let plain = event.modifierFlags.intersection([.command, .control, .option]).isEmpty
         if event.keyCode == 53, session?.transformEdit != nil {
             session?.cancelTransform()
@@ -418,6 +419,8 @@ final class LayerTableView: NSTableView {
             session?.swapPaletteColors()
         } else if plain, event.charactersIgnoringModifiers?.lowercased() == "d" {
             session?.resetPaletteColors()
+        } else if plain, event.charactersIgnoringModifiers?.lowercased() == "t" {
+            session?.selectTool(.type)
         } else if plain, ["a", "v", "h", "z", "b", "e", "g", "l", "m", "w", "j", "s", "u", "r", "i", "c"].contains(event.charactersIgnoringModifiers?.lowercased() ?? "") {
             let key = event.charactersIgnoringModifiers?.lowercased()
             if key == "m" { if !event.isARepeat { session?.pressMarqueeKey() } }
@@ -426,7 +429,8 @@ final class LayerTableView: NSTableView {
                 session?.selectTool(.brush)
                 session?.brushMode = key == "e" ? .erase : .paint
             }
-            else { session?.selectTool(key == "a" ? .idle : key == "i" ? .eyedropper : key == "c" ? .crop : key == "r" ? .blur : key == "b" ? .brush : key == "g" ? .gradient : key == "l" ? .lasso : key == "m" ? .marquee : key == "w" ? .wand : key == "j" ? .spotHealing : key == "s" ? .cloneStamp : key == "u" ? .shape : key == "v" ? .move : key == "h" ? .hand : .zoom) }
+            else if key == "w" { if !event.isARepeat { session?.pressWandKey() } }
+            else { session?.selectTool(key == "a" ? .idle : key == "i" ? .eyedropper : key == "c" ? .crop : key == "r" ? .blur : key == "b" ? .brush : key == "g" ? .gradient : key == "l" ? .lasso : key == "m" ? .marquee : key == "j" ? .spotHealing : key == "s" ? .cloneStamp : key == "u" ? .shape : key == "v" ? .move : key == "h" ? .hand : .zoom) }
         } else if plain, let digit = Int(event.charactersIgnoringModifiers ?? ""), session?.usesOpacityKeys == true {
             session?.typeOpacityDigit(digit)
         // With the Move tool the arrows move the layer, as on the canvas, rather than changing the row selection.
@@ -663,7 +667,7 @@ private final class LayerCell: NSTableCellView, NSTextFieldDelegate {
         // A reused cell must not carry another row's half-finished rename.
         if renaming, layerID != layer.id { restoreLabel() }
         if !renaming { nameLabel.stringValue = (layer.maskSourceID == nil ? "" : "↳ ") + layer.name }
-        dimensions.stringValue = layer.liveText != nil ? "Text · Double-click to edit" : layer.adjustment != nil ? "Adjustment · Double-click to edit" : layer.isGroup ? "Folder" : "\(Int(layer.size.width.rounded())) × \(Int(layer.size.height.rounded())) px"
+        dimensions.stringValue = layer.liveText != nil ? "Text" : layer.adjustment != nil ? "Adjustment · Double-click to edit" : layer.isGroup ? "Folder" : "\(Int(layer.size.width.rounded())) × \(Int(layer.size.height.rounded())) px"
         if let source = layer.maskSourceID {
             let sourceName = session.document?.layers.first(where: { $0.id == source })?.name ?? "Missing source"
             dimensions.stringValue = "Clipped to \(sourceName)"
