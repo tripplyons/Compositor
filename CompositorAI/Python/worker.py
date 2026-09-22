@@ -86,9 +86,12 @@ def load():
     import torch
     from diffusers import QwenImage21Pipeline
 
+    import speedups
+
     loaded = QwenImage21Pipeline.from_pretrained(
         MODEL, revision=MODEL_REVISION, torch_dtype=torch.bfloat16, local_files_only=True
     )
+    speedups.apply(loaded)
     pipeline = loaded.to("mps")
 
 
